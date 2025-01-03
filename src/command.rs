@@ -30,6 +30,7 @@ pub struct Command<'a> {
 
     /// Zero or more parameter values.
     parameters: Vec<ParameterNameAndValue<'a>>,
+    per_run_args: Vec<ParameterNameAndValue<'a>>,
 }
 
 impl<'a> Command<'a> {
@@ -38,6 +39,7 @@ impl<'a> Command<'a> {
             name,
             expression,
             parameters: Vec::new(),
+            per_run_args: Vec::new(),
         }
     }
 
@@ -50,8 +52,38 @@ impl<'a> Command<'a> {
             name,
             expression,
             parameters: parameters.into_iter().collect(),
+            per_run_args: Vec::new(),
         }
     }
+
+    pub fn new_parametrized_per_run(
+        name: Option<&'a str>,
+        expression: &'a str,
+        parameters: impl IntoIterator<Item = ParameterNameAndValue<'a>>,
+        per_run_args: impl IntoIterator<Item = ParameterNameAndValue<'a>>,
+    ) -> Command<'a> {
+        Command {
+            name,
+            expression,
+            parameters: parameters.into_iter().collect(),
+            per_run_args: per_run_args.into_iter().collect(),
+        }
+    }
+
+    // pub fn get_all_initated(&self) -> Option<Vec<&Command>> {
+    //     let mut cmds = Vec::new();
+    //     if self.per_run_args.len() > 0 {
+    //         for ele in self.per_run_args.iter() {
+    //             let mut ps = self.parameters.clone();
+    //             ps.push(ele.clone());
+    //             let s = Command::new_parametrized(self.name.clone(), self.expression.clone(), ps);
+    //             cmds.push(&s);
+    //         }
+    //         Some(cmds)
+    //     } else {
+    //         None
+    //     }
+    // }
 
     pub fn get_name(&self) -> String {
         self.name.map_or_else(

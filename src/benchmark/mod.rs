@@ -189,7 +189,9 @@ impl<'a> Benchmark<'a> {
             preparation_result.map_or(0.0, |res| res.time_real + self.executor.time_overhead());
 
         // Initial timing run
-        let (res, status) = self.executor.run_command_and_measure(self.command, None)?;
+        // let commands = self.command.get_all_initated();
+        // let commands = commands.unwrap_or(vec![self.command]);
+        let (res, status) = self.executor.run_command_and_measure(&self.command, None)?;
         let success = status.success();
 
         // Determine number of benchmark runs

@@ -4,6 +4,7 @@ use super::benchmark_result::BenchmarkResult;
 use super::executor::{Executor, MockExecutor, RawExecutor, ShellExecutor};
 use super::{relative_speed, Benchmark};
 
+use crate::benchmark::relative_speed::BenchmarkResultWithRelativeSpeed;
 use crate::command::Commands;
 use crate::export::ExportManager;
 use crate::options::{ExecutorKind, Options, OutputStyleOption};
@@ -64,6 +65,15 @@ impl<'a> Scheduler<'a> {
 
         if let Some(mut annotated_results) = relative_speed::compute(&self.results) {
             annotated_results.sort_by(|l, r| relative_speed::compare_mean_time(l.result, r.result));
+            let annotated_results: Vec<BenchmarkResultWithRelativeSpeed> = annotated_results
+                .into_iter()
+                .filter(|a| {
+                    a.result
+                        .exit_codes
+                        .iter()
+                        .all(|x| x.is_some() && x.unwrap() == 0)
+                })
+                .collect();
 
             let fastest = &annotated_results[0];
             let others = &annotated_results[1..];
